@@ -8,6 +8,7 @@ class ICommand(ABC):
         pass
 
 
+# Executors' classes
 class ColdFoodApp:
     def make_order(self):
         print("ColdFoodApp makes an order")
@@ -16,19 +17,20 @@ class ColdFoodApp:
         print("ColdFoodApp ask for cooking meals and it's delivery ")
 
     def withdraw_and_pay_money(self):
-        print("ColdFoodApp withdraws money from the client and sends it to the restaurant and the courier")
+        print("ColdFoodApp withdraws money from the client "
+              "and sends it to the restaurant and the courier")
 
 
-class ChiefCooker:
+class Restaurant:
+    def get_order(self):
+        print("The restaurant receives an order through the app")
 
-    def applied_sauce(self):
-        print("")
+    def cook_meals(self):
+        print("The restaurant cooks ordered meals")
 
-    def add_topping_to_pizza(self):
-        print("")
+    def hand_ordet_to_courier(self):
+        print("The restaurant hands meals to the courier")
 
-    def bon_appetit(self):
-        print("")
 
 class Courier:
     def pick_up_order(self):
@@ -38,105 +40,84 @@ class Courier:
         print("The courier delivers the order")
 
 
-
-
-class PrepareStoveCommand(ICommand):
-    """Класс команды для разогрева печи"""
-    def __init__(self, executor: Stove):
+# ColdFoodApp commands
+class MakeOrderAppCommand(ICommand):
+    def __init__(self, executor: ColdFoodApp):
         self.__executor = executor
 
     def execute(self) -> None:
-        self.__executor.prepare_stove()
+        self.__executor.make_order()
 
 
-class PrepareDoughCommand(ICommand):
-    """Класс команды для подготовки теста пиццы"""
-    def __init__(self, executor: ChiefAssistant):
+class AskPrepareDeliveryCommand(ICommand):
+    def __init__(self, executor: ColdFoodApp):
         self.__executor = executor
 
     def execute(self) -> None:
-        self.__executor.prepare_pizza_dough()
+        self.__executor.ask_for_preparing_and_delivery()
 
 
-class PrepareToppingCommand(ICommand):
-    """Класс команды для нарезки начинки пиццы"""
-    def __init__(self, executor: ChiefAssistant):
-        self.__executor = executor
-
-    def execute(self) -> None:
-        self.__executor.prepare_topping()
-
-
-class PrepareSauceCommand(ICommand):
-    """Класс команды для приготовления соуса"""
-    def __init__(self, executor: ChiefAssistant):
+class WithdrawAndPayCommand(ICommand):
+    def __init__(self, executor: ColdFoodApp):
         self.__executor = executor
 
     def execute(self) -> None:
         self.__executor.withdraw_and_pay_money()
 
 
-class CookingPizzaCommand(ICommand):
-    """Класс команды для приготовления пиццы в печи"""
-    def __init__(self, executor: Stove):
+# Restaurant commands
+class GetOrderCommand(ICommand):
+    def __init__(self, executor: Restaurant):
         self.__executor = executor
 
     def execute(self) -> None:
-        self.__executor.cooking_pizza()
+        self.__executor.get_order()
 
 
-class MakePizzaBaseCommand(ICommand):
-    """Класс команды для приготовления основы для пиццы"""
-    def __init__(self, executor: ChiefCooker):
+class CookMealsCommand(ICommand):
+    def __init__(self, executor: Restaurant):
         self.__executor = executor
 
     def execute(self) -> None:
-        self.__executor.make_pizza_base()
+        self.__executor.cook_meals()
 
 
-class AppliedSauceCommand(ICommand):
-    """Класс команды для нанесения соуса на пиццу"""
-    def __init__(self, executor: ChiefCooker):
+class HandOrderToCourierCommand(ICommand):
+    def __init__(self, executor: Restaurant):
         self.__executor = executor
 
     def execute(self) -> None:
-        self.__executor.applied_sauce()
+        self.__executor.hand_ordet_to_courier()
 
 
-class AddToppingCommand(ICommand):
-    """Класс команды для добавления начинки на пиццу"""
-
-    def __init__(self, executor: ChiefCooker):
+# Courier commands
+class PickUpCommand(ICommand):
+    def __init__(self, executor: Courier):
         self.__executor = executor
 
     def execute(self) -> None:
-        self.__executor.add_topping_to_pizza()
+        self.__executor.pick_up_order()
 
 
-class BonAppetitCommand(ICommand):
-    """Класс команды для пожелания клиенту
-       приятного аппетита"""
-
-    def __init__(self, executor: ChiefCooker):
+class DeliveryCommand(ICommand):
+    def __init__(self, executor: Courier):
         self.__executor = executor
 
     def execute(self) -> None:
-        self.__executor.bon_appetit()
+        self.__executor.delivery_order()
 
 
-class Pizzeria:
-    """Класс агрегации всех команд для приготовления
-       пиццы"""
+# Class of ColdFood's delivery meals system
+class ColdFoodSystem:
     def __init__(self):
         self.history: List[ICommand] = []
 
-    def addCommand(self, command: ICommand) -> None:
+    def add_command(self, command: ICommand) -> None:
         self.history.append(command)
 
-    def cook(self) -> None:
+    def make_money(self) -> None:
         if not self.history:
-            print("Не задана очередность выполнения"
-                  " команд приготовления пиццы")
+            print("The sequence of commands is empty")
         else:
             for executor in self.history:
                 executor.execute()
@@ -144,19 +125,18 @@ class Pizzeria:
 
 
 if __name__ == "__main__":
-    chief = ChiefCooker()
-    assistant = ChiefAssistant()
-    stove = Stove()
-    pizzeria = Pizzeria()
-    # формируем последовательность команд для приготовления пиццы
-    pizzeria.addCommand(PrepareDoughCommand(assistant))
-    pizzeria.addCommand(MakePizzaBaseCommand(chief))
-    pizzeria.addCommand(PrepareSauceCommand(assistant))
-    pizzeria.addCommand(AppliedSauceCommand(chief))
-    pizzeria.addCommand(PrepareStoveCommand(stove))
-    pizzeria.addCommand(PrepareToppingCommand(assistant))
-    pizzeria.addCommand(AddToppingCommand(chief))
-    pizzeria.addCommand(CookingPizzaCommand(stove))
-    pizzeria.addCommand(BonAppetitCommand(chief))
-    # запускаем процесс приготовления пиццы
-    pizzeria.cook()
+    cold_food_app = ColdFoodApp()
+    restaurant = Restaurant()
+    courier = Courier()
+    cold_food_system = ColdFoodSystem()
+    # Creating a sequence of commands
+    cold_food_system.add_command(MakeOrderAppCommand(cold_food_app))
+    cold_food_system.add_command(AskPrepareDeliveryCommand(cold_food_app))
+    cold_food_system.add_command(GetOrderCommand(restaurant))
+    cold_food_system.add_command(CookMealsCommand(restaurant))
+    cold_food_system.add_command(HandOrderToCourierCommand(restaurant))
+    cold_food_system.add_command(PickUpCommand(courier))
+    cold_food_system.add_command(DeliveryCommand(courier))
+    cold_food_system.add_command(WithdrawAndPayCommand(cold_food_app))
+    # Let's make some money
+    cold_food_system.make_money()
