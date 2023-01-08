@@ -18,7 +18,7 @@ class Template:
 if __name__ == '__main__':
     user_file = '/Users/dmytror/Documents/test_files.Text1.tct'
     user_template = Template()
-    user_template.file_path = user_file
+
 
     print(user_template.__dict__)
 
