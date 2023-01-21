@@ -23,7 +23,7 @@ class FoodFactory:
 
 menu = ('cake', 'pizza')
 
-client_order = input('Place your order: cake or pizza')
+client_order = input('Place your order: cake or pizza: ')
 if client_order not in menu:
     print('There is no such a meal in the Menu')
 else:
